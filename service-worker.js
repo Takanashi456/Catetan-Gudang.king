@@ -1,4 +1,4 @@
-const CACHE = "stokku-v2";
+const CACHE = "stokku-v3";
 const FILES = [
   "./",
   "./index.html",
