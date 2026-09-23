@@ -141,3 +141,4 @@ if("serviceWorker" in navigator)window.addEventListener("load",()=>navigator.ser
 renderDashboard();
 renderItems();
 renderTransactionRows();
+
