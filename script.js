@@ -48,8 +48,17 @@ function deleteItem(id){
   items=items.filter(x=>x.id!==id);save();renderItems();renderTransactionRows();
 }
 function historyHTML(t){
-  const names=t.items.map(x=>`${esc(items.find(i=>i.id===x.itemId)?.name||"Barang dihapus")} (${x.qty})`).join(", ");
-  return `<div class="history-card"><div class="top"><strong>${esc(formatDate(t.date))}</strong><span class="badge ${t.type}">${t.type==="in"?"PEMASUKAN":"PENGELUARAN"}</span></div><p>${esc(t.description||"Tanpa keterangan")}</p><ul class="history-items">${t.items.map(x=>`<li>${esc(items.find(i=>i.id===x.itemId)?.name||"Barang dihapus")} — ${x.qty}</li>`).join("")}</ul></div>`;
+  return `<div class="history-card"><div class="top"><strong>${esc(formatDate(t.date))}</strong><span class="badge ${t.type}">${t.type==="in"?"PEMASUKAN":"PENGELUARAN"}</span></div><p>${esc(t.description||"Tanpa keterangan")}</p><ul class="history-items">${t.items.map(x=>`<li>${esc(items.find(i=>i.id===x.itemId)?.name||"Barang dihapus")} — ${x.qty}</li>`).join("")}</ul><div class="history-actions"><button type="button" class="small-btn danger" data-delete-transaction="${esc(t.id)}">Hapus riwayat</button></div></div>`;
+}
+function deleteTransaction(id){
+  const tx=transactions.find(t=>t.id===id);
+  if(!tx)return;
+  if(!confirm("Hapus riwayat transaksi ini? Stok akan otomatis disesuaikan."))return;
+  transactions=transactions.filter(t=>t.id!==id);
+  save();
+  renderHistory();
+  renderDashboard();
+  renderItems();
 }
 function formatDate(d){if(!d)return "-";const [y,m,day]=d.split("-");return `${day}/${m}/${y}`}
 function renderHistory(){
@@ -63,6 +72,13 @@ function renderHistory(){
   }).sort((a,b)=>b.createdAt-a.createdAt);
   $("historyList").innerHTML=data.length?data.map(historyHTML).join(""):`<div class="empty">Tidak ada transaksi yang cocok dengan filter.</div>`;
 }
+document.addEventListener("click", function(e){
+  const btn=e.target.closest("[data-delete-transaction]");
+  if(!btn) return;
+  e.preventDefault();
+  deleteTransaction(btn.getAttribute("data-delete-transaction"));
+});
+
 function renderTransactionRows(){
   const box=$("transactionItems");
   if(!box.children.length)addTransactionRow();
@@ -141,4 +157,3 @@ if("serviceWorker" in navigator)window.addEventListener("load",()=>navigator.ser
 renderDashboard();
 renderItems();
 renderTransactionRows();
-
